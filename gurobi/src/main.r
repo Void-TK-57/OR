@@ -8,7 +8,9 @@ load.json <- function(name, path = "../data/") {
     # load json
     result <- fromJSON(file = file_path)
     # convert to data frame
-     data_frame <- as.data.frame(result)
+    data_frame <- as.data.frame(result)
+    # change row names
+    row.names(data_frame) <- names(data_frame)
     # return the daframe
     return(data_frame )
 }
