@@ -81,12 +81,15 @@ main <- function(file) {
     # create model
     model <- create.model(A, z, rhs, sense, "max", "B")
 
+    # get vertexs
+    vertices <- row.names(data_frame)[as.logical(model$x)]
+
     # print model X and objective value
-    print("X:")
-    print(model$x)
+    print("Vertices:")
+    print(vertices)
     print("==========================")
-    print("Z:")
-    print(model$objval)
+    print("Total:")
+    print(length(vertices))
 }
 
 # get args of the script
