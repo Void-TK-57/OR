@@ -1,5 +1,6 @@
 # load json library
 library("rjson")
+library("gurobi")
 
 # functio to load a json file to dataframe
 load.json <- function(name, path = "../data/") {
@@ -15,12 +16,43 @@ load.json <- function(name, path = "../data/") {
     return(data_frame )
 }
 
+# fucntion to create restriction matrix
+restriction.matrix <- function(data_frame) {
+    # restrictions
+    restrictions <- vector()
+    # number of rows
+    n_rows <- 0
+    # for each row
+    for (row in 1:nrow(data_frame) ) {
+        # for each col after row
+        for (col in row:ncol(data_frame[row, ]) ) {
+           # check if has a connection
+           if (data_frame[row, col] == 1) {
+               # create restriction vector
+               restriction <- rep(0, nrow(data_frame))
+               # change  restriction at row and col to 1
+               restriction[row] <- 1
+               restriction[col] <- 1
+               # add to restrictions
+               restrictions <- c(restrictions, restriction)
+               # increase n_rows
+               n_rows <- n_rows + 1
+           }
+        }
+    }
+    # create as matrix
+    restriction_matrix <- matrix(restrictions, nrow = n_rows, ncol =nrow(data_frame), byrow=TRUE)
+    # return restriction matrix
+    return(restriction_matrix)
+}
+
 # main function
 main <- function(file) {
     # load json file
-    data_frame = load.json(file)
-    # print data frmae
-    print(data_frame)
+    data_frame <- load.json(file)
+    # get restriction matriz
+    A <- restriction.matrix(data_frame)
+    print(A)
 }
 
 # get args of the script
