@@ -16,6 +16,7 @@ load.json <- function(name, path = "../data/") {
     return(data_frame )
 }
 
+
 # fucntion to create restriction matrix
 restriction.matrix <- function(data_frame) {
     # restrictions
@@ -46,13 +47,46 @@ restriction.matrix <- function(data_frame) {
     return(restriction_matrix)
 }
 
+# solve ppl 
+create.model <- function(A, obj, rhs, sense, modelsense, vtype) {
+    # create model list
+    model            <- list()
+    model$A          <- A
+    model$obj        <- obj
+    model$modelsense <- modelsense
+    model$rhs        <- rhs
+    model$sense      <- sense
+    model$vtype      <- vtype
+    # create model solved
+    model <- gurobi(model, list(OutputFlag = 0))
+    # return model
+    return(model)
+}
+
 # main function
 main <- function(file) {
     # load json file
     data_frame <- load.json(file)
+
+    # model parameters
     # get restriction matriz
     A <- restriction.matrix(data_frame)
-    print(A)
+    # get objective
+    z <- rep(1, nrow(data_frame) )
+    # get rhs
+    rhs <- rep(1, nrow(A) )
+    # set sense to <=
+    sense <- rep('<', nrow(A))
+
+    # create model
+    model <- create.model(A, z, rhs, sense, "max", "B")
+
+    # print model X and objective value
+    print("X:")
+    print(model$x)
+    print("==========================")
+    print("Z:")
+    print(model$objval)
 }
 
 # get args of the script
