@@ -1,11 +1,12 @@
 # load json library
 library("rjson")
 library("gurobi")
+library("igraph")
 
 # functio to load a json file to dataframe
 load.json <- function(name, path = "../data/") {
     # get path of the file
-    file_path <- paste(path, name, sep="")
+    file_path <- paste(path, name, ".json",sep="")
     # load json
     result <- fromJSON(file = file_path)
     # convert to data frame
@@ -63,10 +64,29 @@ create.model <- function(A, obj, rhs, sense, modelsense, vtype) {
     return(model)
 }
 
+# get graph connections coordinates
+connection.coordinates <- function(data_frame) {
+    # restrictions
+    coordinates <- vector()
+    # for each row
+    for (row in 1:nrow(data_frame) ) {
+        # for each col after row
+        for (col in row:ncol(data_frame[row, ]) ) {
+           # check if has a connection
+           if (data_frame[row, col] == 1) {
+               coordinates <- c(coordinates, row, col)
+           }
+        }
+    }
+    # return coordinates
+    return(coordinates)
+}
+
 # main function
 main <- function(file) {
     # load json file
     data_frame <- load.json(file)
+
 
     # model parameters
     # get restriction matriz
@@ -80,16 +100,22 @@ main <- function(file) {
 
     # create model
     model <- create.model(A, z, rhs, sense, "max", "B")
-
-    # get vertexs
+    # get vertices
     vertices <- row.names(data_frame)[as.logical(model$x)]
 
     # print model X and objective value
     print("Vertices:")
-    print(vertices)
+    print(model$x)
     print("==========================")
     print("Total:")
     print(length(vertices))
+
+    # get graph
+    g <- graph( edges=connection.coordinates(data_frame), n = nrow(data_frame), directed = FALSE )
+    # set independent atribut
+    V(g)$independent <- model$x
+    jpeg(paste("./../data/", file, ".jpeg", sep=""))
+    plot(g, vertex.color=c( "white", "green")[1 + V(g)$independent])
 }
 
 # get args of the script
