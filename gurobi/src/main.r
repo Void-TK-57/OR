@@ -17,7 +17,6 @@ load.json <- function(name, path = "../data/") {
     return(data_frame )
 }
 
-
 # fucntion to create restriction matrix
 restriction.matrix <- function(data_frame) {
     # restrictions
@@ -87,8 +86,6 @@ main <- function(file) {
     # load json file
     data_frame <- load.json(file)
 
-
-    # model parameters
     # get restriction matriz
     A <- restriction.matrix(data_frame)
     # get objective
@@ -103,17 +100,11 @@ main <- function(file) {
     # get vertices
     vertices <- row.names(data_frame)[as.logical(model$x)]
 
-    # print model X and objective value
-    print("Vertices:")
-    print(model$x)
-    print("==========================")
-    print("Total:")
-    print(length(vertices))
-
-    # get graph
+    # create graph
     g <- graph( edges=connection.coordinates(data_frame), n = nrow(data_frame), directed = FALSE )
-    # set independent atribut
+    # set independent atribute for the nodes of the graph
     V(g)$independent <- model$x
+    # create graph jpeg
     jpeg(paste("./../data/", file, ".jpeg", sep=""))
     plot(g, vertex.color=c( "white", "green")[1 + V(g)$independent])
 }
