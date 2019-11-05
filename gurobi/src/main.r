@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 # load json library
 library("rjson")
 library("gurobi")
