@@ -1,9 +1,10 @@
 #!/usr/bin/env Rscript
 
-# load json library
-library("rjson")
-library("gurobi")
-library("igraph")
+# load libraries
+library("rjson", warn.conflicts=FALSE)
+library("gurobi", warn.conflicts=FALSE)
+library("igraph", warn.conflicts=FALSE)
+library("dplyr", warn.conflicts=FALSE)
 
 
 # solve ppl 
@@ -22,30 +23,35 @@ create.model <- function(A, obj, rhs, sense, modelsense, vtype) {
     return(model)
 }
 
-# get graph connections coordinates
-connection.coordinates <- function(data_frame) {
-    # restrictions
-    coordinates <- vector()
-    # for each row
-    for (row in 1:nrow(data_frame) ) {
-        # for each col after row
-        for (col in row:ncol(data_frame[row, ]) ) {
-           # check if has a connection
-           if (data_frame[row, col] == 1) {
-               coordinates <- c(coordinates, row, col)
-           }
-        }
-    }
-    # return coordinates
-    return(coordinates)
+# function to get a matrix and points from the dataframe data
+filter <- function(data_frame) {
+    # number of cols
+    number_of_cols <- ncol(data_frame)
+    # get the points itself
+    p1 <- data_frame$p1
+    p2 <- data_frame$p2
+    # select the data itself
+    data <- dplyr::select(data_frame, -c(number_of_cols, number_of_cols-1))
+    # list return
+    data_list <- list()
+    # set data and points
+    data_list$data <- data
+    data_list$p1 <- p1
+    data_list$p2 <- p2
+    # return the data filtered
+    return(data_list)
 }
 
 # main function
-main <- function(file) {
-    data_frame <- read.csv( paste("./../data/formatted/", file, ".csv", sep="") )
-    
-     # get restriction matriz
-    A <- data.matrix(data_frame)
+main <- function(file, vertex_size = 15) {
+    print( noquote("Reading Data...") )
+    # load data
+    data <- read.csv( paste("./../data/formatted/", file, ".csv", sep="") )
+    # filter data
+    data <- filter(data)
+
+    # get restriction matrix
+    A <- data.matrix(data$data)
     # get objective
     z <- rep(1, ncol(A) )
     # get rhs
@@ -53,26 +59,36 @@ main <- function(file) {
     # set sense to <=
     sense <- rep('<', nrow(A))
 
+    print( noquote( "Solving...") )
     # create model
     model <- create.model(A, z, rhs, sense, "max", "B")
 
-    print("================================")
-    print("X:")
-    print(model$x)
-    print("================================")
-    print("Obj:")
-    print(model$objval)
-    print("================================")
-    return(0)
-
+    # get coordinates
+    coordinates <- as.vector( rbind(data$p1, data$p2) )
     
+    print( noquote( "Generating Graphs:") )
     # create graph
-    g <- graph( edges=connection.coordinates(data_frame), n = nrow(A), directed = FALSE )
+    graph <- igraph::graph( edges=coordinates, n = ncol(A), directed = FALSE )
     # set independent atribute for the nodes of the graph
-    V(g)$independent <- model$x
-    # create graph jpeg
-    jpeg(paste("./../results/", file, ".jpeg", sep=""))
-    plot(g, vertex.color=c( "white", "green" )[1 + V(g)$independent])
+    V(graph)$independent <- model$x
+    # random colors code and name
+    colors <- list("#2ded72", "#36d9cb", "#e8832a", "#963bff", "#ff73b4", "#ff3333")
+    names(colors) <- c("Green", "Blue", "Orange", "Purple", "Pink", "Red")
+    # path of the folder
+    path <- paste("./../results/", file, "/", sep="")
+    # create foler
+    dir.create(path, showWarnings = FALSE)
+    # for each color
+    for (color in names(colors) ) {
+        # file
+        file_name <- paste(file, "-", color, ".jpeg", sep="")
+        print( noquote( paste("Generating: ", path, file_name, sep="") ) )
+        # create graph jpeg
+        jpeg(paste(path, file_name, sep=""))
+        # plot to the jpeg
+        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size/15)
+    }
+    
 }
 
 # get args of the script
@@ -80,50 +96,10 @@ args <- commandArgs(trailingOnly=TRUE)
 # check args
 if (length(args) == 0) {
     print("[Error]: No arguments passed")
-} else {
+} else if (length(args) == 1) {
     main(args[1])
-}
-
-# fucntion to create restriction matrix
-restriction.matrix <- function(data_frame) {
-    # restrictions
-    restrictions <- vector()
-    # number of rows
-    n_rows <- 0
-    # for each row
-    for (row in 1:nrow(data_frame) ) {
-        # for each col after row
-        for (col in row:ncol(data_frame[row, ]) ) {
-           # check if has a connection
-           if (data_frame[row, col] == 1) {
-               # create restriction vector
-               restriction <- rep(0, nrow(data_frame))
-               # change  restriction at row and col to 1
-               restriction[row] <- 1
-               restriction[col] <- 1
-               # add to restrictions
-               restrictions <- c(restrictions, restriction)
-               # increase n_rows
-               n_rows <- n_rows + 1
-           }
-        }
-    }
-    # create as matrix
-    restriction_matrix <- matrix(restrictions, nrow = n_rows, ncol =nrow(data_frame), byrow=TRUE)
-    # return restriction matrix
-    return(restriction_matrix)
-}
-
-# functio to load a json file to dataframe
-load.json <- function(name, path = "../data/") {
-    # get path of the file
-    file_path <- paste(path, name, ".json",sep="")
-    # load json
-    result <- fromJSON(file = file_path)
-    # convert to data frame
-    data_frame <- as.data.frame(result)
-    # change row names
-    row.names(data_frame) <- names(data_frame)
-    # return the daframe
-    return(data_frame )
+} else if (length(args) == 2) {
+    main(args[1], as.numeric( args[2]) )
+} else {
+    print("[Error]: Invalid number of paramters passed")
 }
