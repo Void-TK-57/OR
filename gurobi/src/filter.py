@@ -16,11 +16,10 @@ def main(path):
     header = file.readline()
     # split
     header = header.split(" ")
-    print(header)
     # open formated file
     formatted_file = open("./formatted/" + path + ".csv", "w+")
     # add header to the formatted file
-    formatted_file.write( "x" + ",x".join([str(i) for i in range( int(header[-2]) ) ] ) + "\n"  )
+    formatted_file.write( "x" + ",x".join([str(i) for i in range( int(header[-2]) ) ] ) + ",p1" + ",p2" + "\n"  )
     # for each line
     for i in range( int( header[-1].rstrip() ) ):
         # read line
@@ -32,6 +31,9 @@ def main(path):
         zeros = ["0" for _ in range( int(header[-2]) )]
         # change zeros at point index to 1
         zeros[p1-1] = zeros[p2 -1] = "1"
+        # add the point to the end
+        zeros.append( str(p1) )
+        zeros.append( str(p2) )
         # transform to text
         text = ",".join(zeros) + "\n"
         # wrtie to formatted file
