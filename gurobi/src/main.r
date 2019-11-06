@@ -83,8 +83,21 @@ connection.coordinates <- function(data_frame) {
     return(coordinates)
 }
 
+# function to read txt
+read.txt <- function(path, name) {
+    # create file path to data
+    file_path <- paste(path, name, ".txt",sep="")
+    # read data
+    my_data <- read.delim(file_path)
+    # return data
+    return(my_data)
+}
+
 # main function
 main <- function(file) {
+    my_data <- read.txt("./../data/", file)
+    print( class( my_data[[names(my_data)]][20] ) )
+    return(0)
     # load json file
     data_frame <- load.json(file)
 
@@ -99,16 +112,14 @@ main <- function(file) {
 
     # create model
     model <- create.model(A, z, rhs, sense, "max", "B")
-    # get vertices
-    vertices <- row.names(data_frame)[as.logical(model$x)]
-
+    
     # create graph
     g <- graph( edges=connection.coordinates(data_frame), n = nrow(data_frame), directed = FALSE )
     # set independent atribute for the nodes of the graph
     V(g)$independent <- model$x
     # create graph jpeg
     jpeg(paste("./../data/", file, ".jpeg", sep=""))
-    plot(g, vertex.color=c( "white", "green")[1 + V(g)$independent])
+    plot(g, vertex.color=c( "white", "green" )[1 + V(g)$independent])
 }
 
 # get args of the script
