@@ -1,0 +1,7 @@
+Uma breve descrição sobre as instâncias:
+
+Existem 0 ou mais linhas começando com c na parte superior do arquivo que são linhas de comentário e podem ser ignoradas.
+
+Seguindo as linhas de comentário, há uma linha com a forma "p edge V E" que especifica o tamanho do gráfico onde V e E são o número de vértices e arestas respectivamente.
+
+O restante do arquivo é uma lista de linhas começando com 'e' que indicam as arestas no gráfico (por exemplo, a linha "e 1 3" indica que existe uma aresta entre o vértice 1 e o vértice 3).

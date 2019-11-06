@@ -16,8 +16,11 @@ def main(path):
     header = file.readline()
     # split
     header = header.split(" ")
+    print(header)
     # open formated file
     formatted_file = open("./formatted/" + path + ".csv", "w+")
+    # add header to the formatted file
+    formatted_file.write( "x" + ",x".join([str(i) for i in range( int(header[-2]) ) ] ) + "\n"  )
     # for each line
     for i in range( int( header[-1].rstrip() ) ):
         # read line
