@@ -84,7 +84,7 @@ main <- function(file, vertex_size = 15) {
         file_name <- paste(file, "-", color, ".jpeg", sep="")
         print( noquote( paste("Generating: ", path, file_name, sep="") ) )
         # create graph jpeg
-        jpeg(paste(path, file_name, sep=""))
+        jpeg(paste(path, file_name, sep=""), width=960, height = 720, quality = 100)
         # plot to the jpeg
         plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size/15)
     }
