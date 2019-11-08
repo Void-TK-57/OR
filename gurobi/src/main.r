@@ -74,15 +74,18 @@ main <- function(file, vertex_size = 15) {
     print( noquote( "Generating Graphs:") )
     # create graph
     graph <- igraph::graph( edges=coordinates, n = ncol(A), directed = FALSE )
+
     # set independent atribute for the nodes of the graph
     V(graph)$independent <- model$x
     # random colors code and name
     colors <- list("#2ded72", "#36d9cb", "#e8832a", "#963bff", "#ff73b4", "#ff3333")
     names(colors) <- c("Green", "Blue", "Orange", "Purple", "Pink", "Red")
+
     # path of the folder
     path <- paste("./../results/", file, "/", sep="")
     # create foler
     dir.create(path, showWarnings = FALSE)
+
     # for each color
     for (color in names(colors) ) {
         # file
@@ -110,7 +113,7 @@ if (length(args) == 0) {
 } else {
     print(noquote("Reading Input..."))
     # load the input dataframe
-    input <- read.csv(paste("./../", args[1], sep=""))
+    input <- read.csv(paste("./../input/", args[1], sep=""))
     # apply main for each row of the input
     apply(input, 1, function(row) { print(noquote(paste("Solving for: ", row[["file"]], sep =""))); main( row[["file"]], as.numeric(row[["size"]]) )  } )
     print(noquote("Done."))
