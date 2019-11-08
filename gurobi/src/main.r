@@ -93,9 +93,9 @@ main <- function(file, vertex_size = 15) {
         # output: generating graph for each color
         print( noquote( paste("Generating: ", path, file_name, sep="") ) )
         # create graph jpeg
-        jpeg(paste(path, file_name, sep=""), width=3200, height = 2400, quality = 100)
+        jpeg(paste(path, file_name, sep=""), width=6400, height = 4800, quality = 100)
         # plot to the jpeg
-        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size/3 )
+        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size, vertex.label.color= "#000000" )
     }
 
     # output: end of file
@@ -114,7 +114,8 @@ if (length(args) == 0) {
     print(noquote("Reading Input..."))
     # load the input dataframe
     input <- read.csv(paste("./../input/", args[1], sep=""))
+    print(input)
     # apply main for each row of the input
     apply(input, 1, function(row) { print(noquote(paste("Solving for: ", row[["file"]], sep =""))); main( row[["file"]], as.numeric(row[["size"]]) )  } )
-    print(noquote("Done."))
+    print(noquote("Saving..."))
 } 
