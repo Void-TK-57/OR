@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 
 # load libraries
-library("rjson", warn.conflicts=FALSE)
 library("gurobi", warn.conflicts=FALSE)
 library("igraph", warn.conflicts=FALSE)
 library("dplyr", warn.conflicts=FALSE)
@@ -18,7 +17,7 @@ create.model <- function(A, obj, rhs, sense, modelsense, vtype) {
     model$sense      <- sense
     model$vtype      <- vtype
     # create model solved
-    model <- gurobi(model, list(OutputFlag = 0))
+    model <- gurobi(model, list(OutputFlag = 1))
     # return model
     return(model)
 }
@@ -44,6 +43,10 @@ filter <- function(data_frame) {
 
 # main function
 main <- function(file, vertex_size = 15) {
+    # set output
+    sink(paste("./../output/", file, ".txt", sep = ""))
+
+    # output: readind data
     print( noquote("Reading Data...") )
     # load data
     data <- read.csv( paste("./../data/formatted/", file, ".csv", sep="") )
@@ -59,13 +62,15 @@ main <- function(file, vertex_size = 15) {
     # set sense to <=
     sense <- rep('<', nrow(A))
 
+    # output: solving the model
     print( noquote( "Solving...") )
     # create model
     model <- create.model(A, z, rhs, sense, "max", "B")
 
-    # get coordinates
+    # get coordinates for the igraph function
     coordinates <- as.vector( rbind(data$p1, data$p2) )
     
+    # output: generating the graph (via igraph)
     print( noquote( "Generating Graphs:") )
     # create graph
     graph <- igraph::graph( edges=coordinates, n = ncol(A), directed = FALSE )
@@ -82,12 +87,16 @@ main <- function(file, vertex_size = 15) {
     for (color in names(colors) ) {
         # file
         file_name <- paste(file, "-", color, ".jpeg", sep="")
+        # output: generating graph for each color
         print( noquote( paste("Generating: ", path, file_name, sep="") ) )
         # create graph jpeg
-        jpeg(paste(path, file_name, sep=""), width=960, height = 720, quality = 100)
+        jpeg(paste(path, file_name, sep=""), width=3200, height = 2400, quality = 100)
         # plot to the jpeg
-        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size/15)
+        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size/3 )
     }
+
+    # output: end of file
+    print(noquote("Done."))
     
 }
 
@@ -98,8 +107,23 @@ if (length(args) == 0) {
     print("[Error]: No arguments passed")
 } else if (length(args) == 1) {
     main(args[1])
-} else if (length(args) == 2) {
-    main(args[1], as.numeric( args[2]) )
 } else {
-    print("[Error]: Invalid number of paramters passed")
+    # index of --size arg
+    index_size_arg <- grep("--size=", args)
+    # check if there is a size in the arguments
+    if (length(index_size_arg) == 0) {
+        # then there is no size argument, for each element call main
+        for (file in args) {
+           main( file)
+        }
+    } else {
+        # then  get size
+        size_vertex <- as.numeric( substr( args[index_size_arg] , 8, stop = 1000L) )
+        # for every other arg
+        for (file in args[args != args[index_size_arg]]) {
+            # call main function for that size
+            main(file, size_vertex)
+        }
+    }
+
 }
