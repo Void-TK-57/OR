@@ -97,6 +97,8 @@ main <- function(file, vertex_size = 15) {
 
     # output: end of file
     print(noquote("Done."))
+    # set output to console again
+    sink()
     
 }
 
@@ -105,25 +107,11 @@ args <- commandArgs(trailingOnly=TRUE)
 # check args
 if (length(args) == 0) {
     print("[Error]: No arguments passed")
-} else if (length(args) == 1) {
-    main(args[1])
 } else {
-    # index of --size arg
-    index_size_arg <- grep("--size=", args)
-    # check if there is a size in the arguments
-    if (length(index_size_arg) == 0) {
-        # then there is no size argument, for each element call main
-        for (file in args) {
-           main( file)
-        }
-    } else {
-        # then  get size
-        size_vertex <- as.numeric( substr( args[index_size_arg] , 8, stop = 1000L) )
-        # for every other arg
-        for (file in args[args != args[index_size_arg]]) {
-            # call main function for that size
-            main(file, size_vertex)
-        }
-    }
-
-}
+    print(noquote("Reading Input..."))
+    # load the input dataframe
+    input <- read.csv(paste("./../", args[1], sep=""))
+    # apply main for each row of the input
+    apply(input, 1, function(row) { print(noquote(paste("Solving for: ", row[["file"]], sep =""))); main( row[["file"]], as.numeric(row[["size"]]) )  } )
+    print(noquote("Done."))
+} 
