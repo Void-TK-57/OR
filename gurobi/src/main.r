@@ -72,8 +72,10 @@ main <- function(file, vertex_size = 15) {
     
     # output: generating the graph (via igraph)
     print( noquote( "Generating Graphs:") )
+    # get number of vertices
+    n_vertex <- ncol(A)
     # create graph
-    graph <- igraph::graph( edges=coordinates, n = ncol(A), directed = FALSE )
+    graph <- igraph::graph( edges=coordinates, n = n_vertex, directed = FALSE )
 
     # set independent atribute for the nodes of the graph
     V(graph)$independent <- model$x
@@ -93,9 +95,9 @@ main <- function(file, vertex_size = 15) {
         # output: generating graph for each color
         print( noquote( paste("Generating: ", path, file_name, sep="") ) )
         # create graph jpeg
-        jpeg(paste(path, file_name, sep=""), width=6400, height = 4800, quality = 100)
+        jpeg(paste(path, file_name, sep=""), width=(13*n_vertex*4)/3, height = 13*n_vertex, quality = 100)
         # plot to the jpeg
-        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.cex = vertex_size, vertex.label.color= "#000000" )
+        plot(graph, vertex.color=c( "#FFFFFF", colors[[color]] )[1 + V(graph)$independent], vertex.size = vertex_size, vertex.label.color= "#000000" )
     }
 
     # output: end of file
