@@ -1,7 +1,7 @@
 #include <iostream>
 #include "SampleDecoder.h"
-#include "MTRand.h"
-#include "BRKGA.h"
+#include "API/MTRand.h"
+#include "API/BRKGA.h"
 
 int main(int argc, char* argv[]) {
 	const unsigned n = 100;		// size of chromosomes
