@@ -33,6 +33,7 @@ public:
 	// (this is done by BRKGA, so rest assured: everything will work just fine with BRKGA).
 	double getBestFitness() const;			// Returns the best fitness in this population
 	double getFitness(unsigned i) const;	// Returns the fitness of chromosome i
+	const std::vector< double >& getBestChromosome() const; // Return the best chromosome in this population
 	const std::vector< double >& getChromosome(unsigned i) const;	// Returns i-th best chromosome
 
 private:
@@ -77,12 +78,18 @@ double Population::getBestFitness() const {
 	return getFitness(0);
 }
 
+
+
 double Population::getFitness(unsigned i) const {
 	return fitness[i].first;
 }
 
 const std::vector< double >& Population::getChromosome(unsigned i) const {
 	return population[ fitness[i].second ];
+}
+
+const std::vector< double >&Population::getBestChromosome() const {
+	return getChromosome(0);
 }
 
 std::vector< double >& Population::getChromosome(unsigned i) {

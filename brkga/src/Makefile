@@ -15,7 +15,7 @@ CFLAGS= -O3 -fopenmp -Wextra -Wall -Weffc++ -ansi -pedantic -Woverloaded-virtual
 #CFLAGS= -DRANGECHECK -Wextra -Wall -Weffc++ -ansi -pedantic -Woverloaded-virtual -Wcast-align -Wpointer-arith
 
 # Objects:
-OBJECTS= Population.o SampleDecoder.o main.o
+OBJECTS= SampleDecoder.o main.o
 
 # Load Object
 LOAD = load.o
@@ -31,9 +31,6 @@ main.o:
 
 SampleDecoder.o:
 	$(CPP) $(CFLAGS) -c SampleDecoder.cpp
-
-Population.o:
-	$(CPP) $(CFLAGS) -c brkgaAPI/Population.cpp
 
 load: $(LOAD)
 	$(CPP) $(CFLAGS) $(LOAD) -o load

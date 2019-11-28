@@ -33,6 +33,31 @@ void print(std::string message) {
 	std::cout<<message<<std::endl;
 }
 
+
+// function to generate a graph based on the dot language
+void write_graph(int n_vertices, std::string filename) {
+	// create file stram
+	std::ofstream file (filename);
+	// if file was opened, starte writing
+	if (file.is_open() ) {
+		// add first lines
+		file << "// Graph Generated from Load File\ngraph {\n";
+		// for each pair
+		for (int i = 0; i < n_vertices; i++) {
+			for (int j = i + 1; j < n_vertices; j++) {
+				file << "\t" << std::to_string(i) << " -- " << std::to_string(j) << ";\n";
+			}
+			
+		}
+		// add end in the file
+		file << "}";
+		// close file
+		file.close();
+	} else {
+		std::cout << "Error: Could not write to file";
+	}
+}
+
 // function to get vector based on string
 int* line_to_numbers(std::string line, int size) {
 	size_t pos = 0;
@@ -115,6 +140,10 @@ int main(int argc, char* argv[]) {
 		print("Error: Unable to open file");
 		return -1;
 	}
+	// set filename to either graph.gv or parameter given
+	std::string filename = (argc >= 3) ? argv[2] : "graph.gv";
+	// write graph
+	write_graph(n_vertices, filename);
 
 	// clear memory
 	delete[] prizes;
