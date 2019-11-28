@@ -1,0 +1,8 @@
+Formato das instâncias
+
+- nº vertices (n)
+- prêmios: 1 a n
+- matriz de distancias
+
+
+O PRIZE, prêmio mínimo a ser coletado na rota, equivale a 75% da soma dos prêmios de todos os vértices
