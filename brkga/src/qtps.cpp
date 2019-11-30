@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "qtps.h"
 
 // print function
 void print(int number) {
@@ -81,7 +82,75 @@ int* line_to_numbers(std::string line, int size) {
 		
 }
 
-int main(int argc, char* argv[]) {
+// function to get the quota
+double get_quota(qtps* problem, double per_centage) {
+	// total sum
+	double sum = 0.0;
+	// for every prize
+	for (int i = 0; i < problem->v; i++) {
+		// add prize to sum
+		sum += problem->prizes[i];
+	}
+	// return the per centage of the sum
+	return per_centage*sum;
+}
+
+// function to load a qtps
+qtps* load(std::string filename) {
+	// create qtps
+	qtps* data = new qtps;
+	// else, first create a file stream
+	std::ifstream file (filename);
+
+	// line string read from the file
+	std::string line;
+
+	// number of vertices, prizes and distances
+	int n_vertices, *prizes, **distances;
+
+	if (file.is_open()) {
+		// get first line
+		std::getline(file,line);
+		// check line
+		while (line[0] == '#') std::getline(file,line);
+		// get number of vertices
+		n_vertices = std::stoi(line);
+		// set v
+		data->v = n_vertices;
+		
+		// get other line
+		std::getline(file,line);
+		// check line
+		while (line[0] == '#') std::getline(file,line);
+		// get as numbers
+		prizes = line_to_numbers(line, n_vertices);
+		// set prizes
+		data->prizes = prizes;
+
+		// allocate distances
+		distances = new int*[n_vertices]; int i = 0;
+		// while there is still line
+  	  	while ( std::getline(file,line) ) {
+			// check line
+			if (line[0] == '#') continue;
+			
+			// get numbers of the line
+			distances[i++] = line_to_numbers(line, n_vertices);
+		}
+		// set distance
+		data->dist = distances;
+
+  	  	// close file 
+		file.close();
+		
+	} 
+
+	// return data
+	return data;
+
+}
+
+int test(int argc, char* argv[]) {
 	// check number of arguments
 	if (argc < 2) {
 		// Tell user and exit

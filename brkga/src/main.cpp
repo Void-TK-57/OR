@@ -3,8 +3,9 @@
 #include "API/MTRand.h"
 #include "API/BRKGA.h"
 #include "instance.h"
+#include "qtps.h"
 
-void show_vector(std::vector<double> const &input) {
+void show_vector(std::vector<bool> const &input) {
 	for (int i = 0; i < input.size(); i++) {
 		std::cout << input.at(i) << ' ';
 	}
@@ -48,17 +49,27 @@ int chromosome_size(int n) {
 }
 
 int main(int argc, char* argv[]) {
-    const unsigned n = chromosome_size(6);		// size of chromosomes
-	const unsigned p = 1000;	// size of population
+    // check number of arguments
+	if (argc < 2) {
+		// Tell user and exit
+		std::cout <<"Error: Invalid Number of paramters" << std::endl;;
+		return -1;
+	} 
+
+    // get qtps problema
+    qtps* problem = load( "./../data/" + std::string( argv[1]) + ".txt" );
+
+    const unsigned n = chromosome_size(problem->v);		// size of chromosomes
+	const unsigned p = 100;	// size of population
 	const double pe = 0.20;		// fraction of population to be the elite-set
 	const double pm = 0.10;		// fraction of population to be replaced by mutants
 	const double rhoe = 0.70;	// probability that offspring inherit an allele from elite parent
 	const unsigned K = 3;		// number of independent populations
 	const unsigned MAXT = 2;	// number of threads for parallel decoding
 	
-	SampleDecoder decoder;			// initialize the decoder
+	SampleDecoder decoder(problem);			// initialize the decoder
 	
-	const long unsigned rngSeed = 4;	// seed to the random number generator
+	const long unsigned rngSeed = 2;	// seed to the random number generator
 	MTRand rng(rngSeed);				// initialize the random number generator
 	
 	// initialize the BRKGA-based heuristic
@@ -67,7 +78,7 @@ int main(int argc, char* argv[]) {
 	unsigned generation = 0;		// current generation
 	const unsigned X_INTVL = 100;	// exchange best individuals at every 100 generations
 	const unsigned X_NUMBER = 2;	// exchange top 2 best
-	const unsigned MAX_GENS = 1000;	// run for 1000 gens
+	const unsigned MAX_GENS = 4000;	// run for 1000 gens
 
 	do {
         // show progress bar
@@ -86,12 +97,20 @@ int main(int argc, char* argv[]) {
 	} while (generation < MAX_GENS);
 
     std::cout << "====================================================" << std::endl;
+
     std::cout <<"Best Chromosome: ";
-    show_vector( algorithm.getBestChromosome() );
+    show_vector( as_boolean( algorithm.getBestChromosome() ) );
     // get number of vertices
-	int n_v = get_vertices(algorithm.getBestChromosome().size() );
-    std::cout << "Vertices: " << n_v << std::endl << std::endl;
-    create_instance( algorithm.getBestChromosome() );
+
+	instance* graph = create_instance( algorithm.getBestChromosome() );
+    // print graph
+
+    //std::cout << "Graph: " << std::endl;
+    //print(graph);
+
+    instance* total = create_instance( problem->v );
+    // write graph
+    write_graph( create_edges( total ) , create_edges(graph) , "./../output/" + std::string(argv[1]) + ".dot");
     std::cout << "Best Fitness " << algorithm.getBestFitness() << std::endl;
 	
 	return 0;

@@ -15,10 +15,7 @@ CFLAGS= -O3 -fopenmp -Wextra -Wall -Weffc++ -ansi -pedantic -Woverloaded-virtual
 #CFLAGS= -DRANGECHECK -Wextra -Wall -Weffc++ -ansi -pedantic -Woverloaded-virtual -Wcast-align -Wpointer-arith
 
 # Objects:
-OBJECTS= SampleDecoder.o main.o instance.o
-
-# Load Object
-LOAD = load.o
+OBJECTS= SampleDecoder.o main.o instance.o qtps.o
 
 # Targets:
 all: main
@@ -35,11 +32,8 @@ SampleDecoder.o:
 instance.o:
 	$(CPP) $(CFLAGS) -c instance.cpp
 
-load: $(LOAD)
-	$(CPP) $(CFLAGS) $(LOAD) -o load
-
-load.o:
-	$(CPP) $(CFLAGS) -c load.cpp
+qtps.o:
+	$(CPP) $(CFLAGS) -c qtps.cpp
 
 clean:
-	rm -f main $(OBJECTS) load $(LOAD)
+	rm -f main $(OBJECTS)

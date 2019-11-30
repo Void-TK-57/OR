@@ -21,10 +21,12 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include "qtps.h"
 
 class SampleDecoder {
 public:
-	SampleDecoder();
+	qtps* problem;
+	SampleDecoder(qtps*);
 	~SampleDecoder();
 
 	double decode(const std::vector< double >& chromosome) const;
