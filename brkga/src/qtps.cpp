@@ -34,7 +34,6 @@ void print(std::string message) {
 	std::cout<<message<<std::endl;
 }
 
-
 // function to generate a graph based on the dot language
 void write_graph(int n_vertices, std::string filename) {
 	// create file stram

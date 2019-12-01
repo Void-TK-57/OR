@@ -8,6 +8,7 @@
 #include "SampleDecoder.h"
 #include "instance.h"
 #include "qtps.h"
+#include <math.h>
 #include <iostream>
 
 SampleDecoder::SampleDecoder(qtps* p) : problem(p) { }
@@ -16,11 +17,7 @@ SampleDecoder::~SampleDecoder() { }
 
 // Runs in \Theta(n \log n):
 double SampleDecoder::decode(const std::vector< double >& chromosome) const {
-
-	// get as boolean
-	// std::vector<bool> binary = as_boolean(chromosome);
-
-	// get graph instance
+	// convert graph instance
 	instance* graph = create_instance(chromosome);
 
 	// total cost
@@ -28,7 +25,7 @@ double SampleDecoder::decode(const std::vector< double >& chromosome) const {
 	// total prizes collected
 	double prize = 0;
 
-	// for every vertice
+	// for every vertex
 	for (int i = 0; i < graph->v; i++) {
 		// get number of connection
 		int number_of_connections = graph->sizes[i];
@@ -43,12 +40,21 @@ double SampleDecoder::decode(const std::vector< double >& chromosome) const {
 		}
 	}
 
-	// if prize is higher then the quota, the
-
-
 	// get quota
 	double quota = get_quota(problem, 0.75);
 	
+	// if prize is higher then the quota, the
+	if (prize < quota) {
+		// return infinity
+		return INFINITY;
+	}
+
+	// check if it is valid
+	if ( ! is_valid( graph ) ) {
+	 	// return infinity
+	 	return INFINITY;
+	}
+
 	// sample fitness is the first allele
 	return cost;
 }

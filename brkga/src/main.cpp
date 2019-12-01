@@ -5,7 +5,8 @@
 #include "instance.h"
 #include "qtps.h"
 
-void show_vector(std::vector<bool> const &input) {
+// function to print boolean vector
+void print(std::vector<bool> const &input) {
 	for (int i = 0; i < input.size(); i++) {
 		std::cout << input.at(i) << ' ';
 	}
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]) {
     qtps* problem = load( "./../data/" + std::string( argv[1]) + ".txt" );
 
     const unsigned n = chromosome_size(problem->v);		// size of chromosomes
-	const unsigned p = 100;	// size of population
+	const unsigned p = 300;	// size of population
 	const double pe = 0.20;		// fraction of population to be the elite-set
 	const double pm = 0.10;		// fraction of population to be replaced by mutants
 	const double rhoe = 0.70;	// probability that offspring inherit an allele from elite parent
@@ -78,7 +79,7 @@ int main(int argc, char* argv[]) {
 	unsigned generation = 0;		// current generation
 	const unsigned X_INTVL = 100;	// exchange best individuals at every 100 generations
 	const unsigned X_NUMBER = 2;	// exchange top 2 best
-	const unsigned MAX_GENS = 4000;	// run for 1000 gens
+	const unsigned MAX_GENS = 6000;	// run for 1000 gens
 
 	do {
         // show progress bar
@@ -98,20 +99,19 @@ int main(int argc, char* argv[]) {
 
     std::cout << "====================================================" << std::endl;
 
+    // print best chromosome
     std::cout <<"Best Chromosome: ";
-    show_vector( as_boolean( algorithm.getBestChromosome() ) );
-    // get number of vertices
-
+    print( as_boolean( algorithm.getBestChromosome() ) );
+    
+    // create graph from best choromosome
 	instance* graph = create_instance( algorithm.getBestChromosome() );
-    // print graph
-
-    //std::cout << "Graph: " << std::endl;
-    //print(graph);
-
-    instance* total = create_instance( problem->v );
     // write graph
-    write_graph( create_edges( total ) , create_edges(graph) , "./../output/" + std::string(argv[1]) + ".dot");
+    write_graph( create_edges( create_instance( problem->v ) ) , create_edges(graph) , "./../output/" + std::string(argv[1]) + ".dot");
     std::cout << "Best Fitness " << algorithm.getBestFitness() << std::endl;
+
+    // show graph
+    std::cout<< "Graph: "<<std::endl;
+    print(graph);
 	
 	return 0;
 }

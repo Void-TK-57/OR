@@ -57,7 +57,7 @@ void show_edges(const edges& s) {
 bool is_valid(instance* graph) {
     // check sizes (for each node it can only visit at most 1, size == 0 or size == 2)
     for (int i = 0; i < graph->v; i++) {
-        if ( (graph->sizes[i] != 2) && (graph->sizes[i] != 0) ) {
+        if (graph->sizes[i] % 2 != 0 ) {
             // return false
             return(false);
         }
