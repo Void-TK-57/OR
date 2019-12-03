@@ -33,8 +33,6 @@ n = 6
 */
 
 // function comparatetor of 2 nodes connection
-
-
 void show_edges(const edges& s) { 
     bool found = false; 
   
@@ -146,6 +144,20 @@ std::vector<bool> as_boolean(const std::vector< double >& chromosome) {
     }
     // return vector
     return binary;
+}
+
+// function to count vector
+int count(std::vector<bool> values) {
+    // start with 0
+    int sum = 0;
+    for (int i = 0; i < values.size(); i++) {
+        // if the value is true, increase count
+        if (values.at(i)) {
+            sum++;
+        }
+    }
+    // return sum
+    return sum;
 }
 
 // function to create a instance from a chromosome

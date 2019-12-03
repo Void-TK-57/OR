@@ -17,29 +17,19 @@ SampleDecoder::~SampleDecoder() { }
 
 // Runs in \Theta(n \log n):
 double SampleDecoder::decode(const std::vector< double >& chromosome) const {
-	// convert graph instance
+
+	// convert to graph instance
 	instance* graph = create_instance(chromosome);
 
+	// get prize and cost
+	int* prize_cost = get_cost_prizes(graph, problem);
+	
 	// total cost
-	double cost = 0;
+	double prize = (double) prize_cost[0];
 	// total prizes collected
-	double prize = 0;
-
-	// for every vertex
-	for (int i = 0; i < graph->v; i++) {
-		// get number of connection
-		int number_of_connections = graph->sizes[i];
-		// if number of connections > 0, then the node was visited and add its prize
-		if (number_of_connections > 0) { 
-			// add its prizes
-			prize += problem->prizes[i];
-		}
-		// for every connection to the other graphs
-		for (int j = 0; j < number_of_connections; j++) {
-			cost += problem->dist[i][j];
-		}
-	}
-
+	double cost = (double) prize_cost[1];
+	// delete prize_cost
+	delete[] prize_cost;
 	// get quota
 	double quota = get_quota(problem, 0.75);
 	
@@ -54,6 +44,9 @@ double SampleDecoder::decode(const std::vector< double >& chromosome) const {
 	 	// return infinity
 	 	return INFINITY;
 	}
+
+	// delete graph
+	delete_instance(graph);
 
 	// sample fitness is the first allele
 	return cost;

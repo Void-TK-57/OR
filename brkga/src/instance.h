@@ -25,6 +25,8 @@ typedef std::set<edge> edges;
 // function to create edges from an instance
 edges create_edges(instance* );
 
+int count(std::vector<bool> );
+
 //function to calculate number of vertices based on total of values
 int get_vertices(int);
 

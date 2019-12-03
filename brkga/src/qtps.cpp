@@ -23,11 +23,28 @@ void print(int** numbers, int size_m, int size_n) {
 	}
 }
 
-/* print function
-void print(char* message) {
-	std::cout<<message<<std::endl;
+int* get_cost_prizes(instance* graph, qtps* p) {
+	int prize = 0;
+	int cost = 0;
+	// for every vertex
+	for (int i = 0; i < graph->v; i++) {
+		// get number of connection
+		int number_of_connections = graph->sizes[i];
+		// if number of connections > 0, then the node was visited and add its prize
+		if (number_of_connections > 0) { 
+			// add its prizes
+			prize += p->prizes[i];
+		}
+		// for every connection to the other graphs
+		for (int j = 0; j < number_of_connections; j++) {
+			cost += p->dist[i][j];
+		}
+	}
+	int* prize_cost = new int[2];
+	prize_cost[0] = prize;
+	prize_cost[1] = cost;
+	return prize_cost;
 }
-*/
 
 // print function
 void print(std::string message) {
@@ -221,4 +238,16 @@ int test(int argc, char* argv[]) {
 	// end function
 	return 0;
 	
+}
+
+// function to delete a qtps
+void delete_qtps(qtps* p) {
+	// for each vertices
+    for (int i = 0; i < p->v; i++) {
+        delete[] p->dist[i];
+    }
+    // delete map and sizes
+    delete[] p->dist;
+    delete[] p->prizes;
+    
 }
